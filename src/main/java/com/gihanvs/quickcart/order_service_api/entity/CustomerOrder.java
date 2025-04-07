@@ -26,7 +26,12 @@ public class CustomerOrder {
     private String userId;
     @Column(name="remark", length=750)
     private String remark;
+    //===================
     @OneToMany(mappedBy = "customerOrder")
     private Set<OrderDetail> products = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(name = "order_status_id")
+    private OrderStatus orderStatus;
+
 
 }
