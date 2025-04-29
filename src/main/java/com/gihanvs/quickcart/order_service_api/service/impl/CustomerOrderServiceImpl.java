@@ -1,13 +1,56 @@
 package com.gihanvs.quickcart.order_service_api.service.impl;
 
 import com.gihanvs.quickcart.order_service_api.dto.request.CustomerOrderRequestDto;
+import com.gihanvs.quickcart.order_service_api.dto.request.OrderDetailRequestDto;
+import com.gihanvs.quickcart.order_service_api.entity.CustomerOrder;
+import com.gihanvs.quickcart.order_service_api.entity.OrderDetail;
+import com.gihanvs.quickcart.order_service_api.entity.OrderStatus;
+import com.gihanvs.quickcart.order_service_api.repo.CustomerOrderRepo;
+import com.gihanvs.quickcart.order_service_api.repo.OrderStatusRepo;
 import com.gihanvs.quickcart.order_service_api.service.CustomerOrderService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@RequiredArgsConstructor
 @Service
 public class CustomerOrderServiceImpl implements CustomerOrderService {
+    private final CustomerOrderRepo customerOrderRepo;
+    private final OrderStatusRepo orderStatusRepo;
     @Override
     public void createOrder(CustomerOrderRequestDto requestDto) {
+        OrderStatus orderStatus =
+                orderStatusRepo.findByStaus("PENDING").orElseThrow(()-> new RuntimeException("Order status is not found."));
+          CustomerOrder customerOrder = new CustomerOrder();
+          customerOrder.setOrderId(UUID.randomUUID().toString());
+          customerOrder.setOrderDate(requestDto.getOrderDate());
+          customerOrder.setRemark("");
+          customerOrder.setTotalAmount(requestDto.getTotalAmount());
+          customerOrder.setUserId(requestDto.getUserId());
+          customerOrder.setProducts(requestDto.getOrderDetails().stream().map(e -> createOrderDetail(e, customerOrder)).collect(Collectors.toSet()));
+          customerOrder.setOrderStatus(orderStatus);
 
+          customerOrderRepo.save(customerOrder);
+    }
+
+
+
+    private OrderDetail createOrderDetail(OrderDetailRequestDto requestDto, CustomerOrder order) {
+        if (requestDto==null) {
+            return null;
+        }
+        return OrderDetail.builder()
+                .detailId(UUID.randomUUID().toString())
+                .unitPrice(requestDto.getUnitPrice())
+                .discount(requestDto.getDiscount())
+                .customerOrder(order)
+                .qty(requestDto.getQty())
+
+                .build();
     }
 }
