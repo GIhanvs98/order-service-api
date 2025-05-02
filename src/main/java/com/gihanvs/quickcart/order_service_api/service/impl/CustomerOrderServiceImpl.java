@@ -4,6 +4,7 @@ import com.gihanvs.quickcart.order_service_api.dto.request.CustomerOrderRequestD
 import com.gihanvs.quickcart.order_service_api.dto.request.OrderDetailRequestDto;
 import com.gihanvs.quickcart.order_service_api.dto.response.CustomerOrderResponsetDto;
 import com.gihanvs.quickcart.order_service_api.dto.response.OrderDetailResponseDto;
+import com.gihanvs.quickcart.order_service_api.dto.response.paginate.CustomerOrderPaginateDto;
 import com.gihanvs.quickcart.order_service_api.entity.CustomerOrder;
 import com.gihanvs.quickcart.order_service_api.entity.OrderDetail;
 import com.gihanvs.quickcart.order_service_api.entity.OrderStatus;
@@ -11,6 +12,7 @@ import com.gihanvs.quickcart.order_service_api.repo.CustomerOrderRepo;
 import com.gihanvs.quickcart.order_service_api.repo.OrderStatusRepo;
 import com.gihanvs.quickcart.order_service_api.service.CustomerOrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,6 +52,19 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     public void deleteById(String orderId) {
         CustomerOrder customerOrder= customerOrderRepo.findById(orderId).orElseThrow(()->new RuntimeException(String.format("Order not Found with %s",orderId)));
         customerOrderRepo.delete(customerOrder);
+    }
+
+    @Override
+    public CustomerOrderPaginateDto searchAll(String searchText, int page, int size) {
+       return CustomerOrderPaginateDto.builder()
+               .count(
+                       customerOrderRepo.count()
+               )
+               .dataList(
+                       customerOrderRepo.searchAll(searchText, PageRequest.of(page,size))
+                               .stream().map(this::toCustomerOrderResponsetDto).collect(Collectors.toList())
+               )
+               .build();
     }
 
     private CustomerOrderResponsetDto toCustomerOrderResponsetDto(CustomerOrder customerOrder) {
