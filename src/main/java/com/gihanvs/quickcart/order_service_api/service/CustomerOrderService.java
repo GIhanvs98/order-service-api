@@ -6,4 +6,5 @@ import com.gihanvs.quickcart.order_service_api.dto.response.CustomerOrderRespons
 public interface CustomerOrderService {
     public void createOrder(CustomerOrderRequestDto requestDto);
     public CustomerOrderResponsetDto findOrderById(String orderId);
+    public void deleteById(String orderId);
 }
