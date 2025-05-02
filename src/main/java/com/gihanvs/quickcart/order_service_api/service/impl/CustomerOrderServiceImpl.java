@@ -2,6 +2,8 @@ package com.gihanvs.quickcart.order_service_api.service.impl;
 
 import com.gihanvs.quickcart.order_service_api.dto.request.CustomerOrderRequestDto;
 import com.gihanvs.quickcart.order_service_api.dto.request.OrderDetailRequestDto;
+import com.gihanvs.quickcart.order_service_api.dto.response.CustomerOrderResponsetDto;
+import com.gihanvs.quickcart.order_service_api.dto.response.OrderDetailResponseDto;
 import com.gihanvs.quickcart.order_service_api.entity.CustomerOrder;
 import com.gihanvs.quickcart.order_service_api.entity.OrderDetail;
 import com.gihanvs.quickcart.order_service_api.entity.OrderStatus;
@@ -38,8 +40,40 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
           customerOrderRepo.save(customerOrder);
     }
 
+    @Override
+    public CustomerOrderResponsetDto findOrderById(String orderId) {
+      CustomerOrder customerOrder= customerOrderRepo.findById(orderId).orElseThrow(()->new RuntimeException(String.format("Order not Found with %s",orderId)));
+        return toCustomerOrderResponsetDto(customerOrder);
+    }
 
-
+    private CustomerOrderResponsetDto toCustomerOrderResponsetDto(CustomerOrder customerOrder) {
+        if (customerOrder == null) {
+            return null;
+        }
+        return CustomerOrderResponsetDto.builder()
+                .orderId(customerOrder.getOrderId())
+                .orderDate(customerOrder.getOrderDate())
+                .userId(customerOrder.getUserId())
+                .totalAmount(customerOrder.getTotalAmount())
+                .remark(customerOrder.getRemark())
+                .status(customerOrder.getOrderStatus().getStatus())
+                .orderDetails(
+                        customerOrder.getProducts().stream().map(this::toOrderDetailResponseDto).collect(Collectors.toList())
+                )
+                .build();
+    }
+    private OrderDetailResponseDto toOrderDetailResponseDto (OrderDetail orderDetail) {
+        if (orderDetail == null) {
+            return null;
+        }
+        return OrderDetailResponseDto.builder()
+                .productId(orderDetail.getProductId())
+                .detailId(orderDetail.getDetailId())
+                .discount(orderDetail.getDiscount())
+                .qty(orderDetail.getQty())
+                .unitPrice(orderDetail.getUnitPrice())
+                .build();
+    }
     private OrderDetail createOrderDetail(OrderDetailRequestDto requestDto, CustomerOrder order) {
         if (requestDto==null) {
             return null;
