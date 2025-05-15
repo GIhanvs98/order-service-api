@@ -24,7 +24,9 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+
 public class CustomerOrderServiceImpl implements CustomerOrderService {
+
     private final CustomerOrderRepo customerOrderRepo;
     private final OrderStatusRepo orderStatusRepo;
     @Override
@@ -44,7 +46,7 @@ public class CustomerOrderServiceImpl implements CustomerOrderService {
     }
 
     @Override
-    public void updateOrder(String orderId ,CustomerOrderRequestDto requestDto) {
+    public void updateOrder(CustomerOrderRequestDto requestDto, String orderId) {
         CustomerOrder customerOrder=
                 customerOrderRepo.findById(orderId).orElseThrow(()->new EntryNotFoundException(String.format("Order not Found with %s",orderId)));
     customerOrder.setOrderDate(requestDto.getOrderDate());
