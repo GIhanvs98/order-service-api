@@ -19,7 +19,7 @@ public class OrderStatus {
     @Id
     @Column(name="status_id", unique=true, nullable=false, length=80)
     private String statusId;
-    @Column(name="status", nullable=false, length=80)
+    @Column(name="status", nullable=false, length=80, unique=true)
     private String status;
     //======================
     @OneToMany(mappedBy = "orderStatus")

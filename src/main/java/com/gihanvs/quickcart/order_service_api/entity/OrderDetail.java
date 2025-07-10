@@ -1,10 +1,7 @@
 package com.gihanvs.quickcart.order_service_api.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -13,6 +10,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class OrderDetail {
     @Id
     @Column(name="detail_id", unique=true, nullable=false, length=80)
@@ -21,9 +19,9 @@ public class OrderDetail {
     private String productId;
     @Column(name="qty", nullable=false)
     private int qty;
-    @Column(name="unit_price", nullable=false, precision=10, scale=2)
+    @Column(name="unit_price", nullable=false)
     private double unitPrice;
-    @Column(name="discount", precision=10, scale=2)
+    @Column(name="discount")
     private double discount;
     @ManyToOne
     @JoinColumn(name = "customer_order_id")
